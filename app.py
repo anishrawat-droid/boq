@@ -48,7 +48,7 @@ frame_processor: FrameProcessor = st.session_state.frame_processor
 # --------------------------------------------------------------------------
 top_l, top_r = st.columns([5, 1])
 with top_l:
-    st.title("📹 Camera Analytics Capacity Estimator")
+    st.title("📹 Jarvis BOQ Calculator")
     st.caption(
         "Enter camera counts per analytics event, tune per-model resource "
         "assumptions if needed, and get the GPU / vCPU / RAM / storage / "
