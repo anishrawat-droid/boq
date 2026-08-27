@@ -1,0 +1,6 @@
+streamlit>=1.32
+openpyxl>=3.1
+ultralytics
+easyocr
+opencv-python-headless
+numpy
