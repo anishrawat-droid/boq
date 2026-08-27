@@ -74,6 +74,12 @@ with left:
         setup.ndvr_hours = c4.number_input("NDVR Buffer (hours)", min_value=0.0, value=float(setup.ndvr_hours))
         setup.bandwidth_mbps_per_camera = c5.number_input("Bandwidth/Camera (Mbps)", min_value=0.0, value=float(setup.bandwidth_mbps_per_camera), step=0.1)
 
+        setup.include_models = st.checkbox(
+            "Include analytics models in BOQ",
+            value=setup.include_models,
+            help="Turn this off to size only the streaming setup and keep model load out of the estimate.",
+        )
+
     st.subheader("Real-Time Analytics (Online Events)")
     st.caption("FPS-driven, always-on inference")
 

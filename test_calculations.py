@@ -31,13 +31,15 @@ def test_storage_matches_reference_sheet():
 
 
 def test_disabling_events_zeroes_them_out():
+    setup = StreamingSetup()
     online = default_online_events()
     for ev in online:
         ev.enabled = False
-    totals = compute_totals(StreamingSetup(), online, [], FrameProcessor(enabled=False))
+    totals = compute_totals(setup, online, [], FrameProcessor(enabled=False))
     assert totals.gpu_gb == 0
-    assert totals.vcpu == 0
-    print("Disable-all check passed")
+    assert totals.ram_gb >= setup.ram_gb
+    assert totals.vcpu >= setup.vcpu
+    print("Disable-all check passed:", totals.ram_gb, "GB RAM |", totals.vcpu, "vCPU")
 
 
 def test_anpr_event_present_in_default_catalog():
@@ -49,6 +51,19 @@ def test_anpr_event_present_in_default_catalog():
     print("ANPR check passed:", event.name, "|", event.cameras, "cameras")
 
 
+def test_streaming_only_mode_ignores_models():
+    setup = StreamingSetup(include_models=False)
+    totals = compute_totals(
+        setup,
+        default_online_events(),
+        default_offline_events(),
+        FrameProcessor(enabled=False),
+    )
+    assert totals.gpu_gb == 0, "Stream-only mode should exclude model GPU load"
+    assert totals.ram_gb >= setup.ram_gb, "Streaming setup should include base RAM"
+    assert totals.vcpu >= setup.vcpu, "Streaming setup should include base vCPU"
+    assert totals.dvr_tb > 0, "Streaming storage should still be calculated"
+    print("Streaming-only check passed:", totals.ram_gb, "GB RAM |", totals.vcpu, "vCPU |", totals.dvr_tb, "TB DVR")
 
 
 if __name__ == "__main__":
@@ -56,4 +71,5 @@ if __name__ == "__main__":
     test_storage_matches_reference_sheet()
     test_disabling_events_zeroes_them_out()
     test_anpr_event_present_in_default_catalog()
+    test_streaming_only_mode_ignores_models()
     print("\nAll checks passed.")

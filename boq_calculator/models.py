@@ -137,3 +137,6 @@ class StreamingSetup:
     dvr_days: float = 180.0
     ndvr_hours: float = 6.0
     bandwidth_mbps_per_camera: float = 1.0
+    ram_gb: float = 64.0
+    vcpu: float = 16.0
+    include_models: bool = True

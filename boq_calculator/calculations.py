@@ -36,21 +36,25 @@ def compute_totals(
 ) -> Totals:
     gpu_mb = ram_mb = vcpu = 0.0
 
-    for ev in online_events:
-        r = ev.resource_usage()
-        gpu_mb += r["gpu_mb"]
-        ram_mb += r["ram_mb"]
-        vcpu += r["vcpu"]
+    ram_mb += setup.ram_gb * 1024
+    vcpu += setup.vcpu
 
-    for ev in offline_events:
-        r = ev.resource_usage()
-        gpu_mb += r["gpu_mb"]
-        ram_mb += r["ram_mb"]
-        vcpu += r["vcpu"]
+    if setup.include_models:
+        for ev in online_events:
+            r = ev.resource_usage()
+            gpu_mb += r["gpu_mb"]
+            ram_mb += r["ram_mb"]
+            vcpu += r["vcpu"]
 
-    fp = frame_processor.resource_usage(setup.total_cameras)
-    ram_mb += fp["ram_mb"]
-    vcpu += fp["vcpu"]
+        for ev in offline_events:
+            r = ev.resource_usage()
+            gpu_mb += r["gpu_mb"]
+            ram_mb += r["ram_mb"]
+            vcpu += r["vcpu"]
+
+        fp = frame_processor.resource_usage(setup.total_cameras)
+        ram_mb += fp["ram_mb"]
+        vcpu += fp["vcpu"]
 
     gpu_gb = math.ceil(gpu_mb / 1024) if gpu_mb > 0 else 0
     gpu_cards = math.ceil(gpu_gb / GPU_CARD_GB) if gpu_gb > 0 else 0
