@@ -1,22 +1,21 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:dind'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
-        REGISTRY = 'localhost:5000'
+        REGISTRY = '10.101.2.88:5000' 
         IMAGE_NAME = 'boq'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
-        stage('Checkout Source Code') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker Image..."
+                echo "Building image inside temporary Docker container..."
                 sh "docker build -t ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ."
                 sh "docker tag ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY}/${IMAGE_NAME}:latest"
             }
@@ -24,7 +23,7 @@ pipeline {
 
         stage('Push to Local Registry') {
             steps {
-                echo "Pushing Image to Local Docker Registry..."
+                echo "Pushing image to local registry..."
                 sh "docker push ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
                 sh "docker push ${REGISTRY}/${IMAGE_NAME}:latest"
             }
@@ -33,9 +32,7 @@ pipeline {
 
     post {
         always {
-            echo "Cleaning up local build tags..."
-            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} || true"
-            sh "docker rmi ${REGISTRY}/${IMAGE_NAME}:latest || true"
+            echo "Pipeline finished. The temporary container will now be automatically destroyed by Jenkins."
         }
     }
 }
