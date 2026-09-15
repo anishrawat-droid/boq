@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'docker:cli'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            args '--user 1000:984 -v /var/run/docker.sock:/var/run/docker.sock -e HOME=/tmp'
         }
     }
 
